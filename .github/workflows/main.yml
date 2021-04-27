@@ -5,7 +5,7 @@ name: Release Binaries
 on:
   push:
     branches: [master]
-  pull_requests:
+  pull_request:
     branches: [master]
     
   workflow_dispatch:
