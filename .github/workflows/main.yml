@@ -64,7 +64,7 @@ jobs:
           echo "| Conjure Postman | $(cd conjure-postman && git describe --tags HEAD) |" >> release.txt
 
       - name: GH Release
-        uses: softprops/action-gh-release@v0.1.5
+        uses: softprops/action-gh-release@master
         with:
           tag_name: ${{ env.release_name }}
           body_path: release.txt
