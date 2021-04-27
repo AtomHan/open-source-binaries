@@ -1,0 +1,12 @@
+[submodule "conjure"]
+	path = conjure
+	url = https://github.com/palantir/conjure
+[submodule "conjure-postman"]
+	path = conjure-postman
+	url = https://github.com/palantir/conjure-postman
+[submodule "conjure-python"]
+	path = conjure-python
+	url = https://github.com/palantir/conjure-python
+[submodule "conjure-typescript"]
+	path = conjure-typescript
+	url = https://github.com/palantir/conjure-typescript

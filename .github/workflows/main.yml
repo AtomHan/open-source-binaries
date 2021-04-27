@@ -1,0 +1,89 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Release Binaries
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+    
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: initialise release
+        run: echo "release_name=auto-release-$(date +'%Y-%m-%dT%H-%M-%S')" >> $GITHUB_ENV
+
+      - name: create release file
+        run: |
+          echo '| Binary | Version |' > release.txt
+          echo '| :-- | --: |' >> release.txt
+
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: 'true'
+          
+      # Used for conjure-typescript
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '15'
+          
+      # Used for conjure-typescript
+      - name: Install yarn
+        run: npm i -g yarn
+
+      - name: Build conjure
+        run: |
+          cd conjure
+          CONJURE_TAG=$(git describe --tags HEAD)
+          echo "Found tag: $CONJURE_TAG"
+          echo "| `conjure` | $CONJURE_TAG |" >> ../release.txt
+          ./gradlew build --no-daemon
+
+      - name: Build conjure-python
+        run: |
+          cd conjure-python
+          CONJURE_TAG=$(git describe --tags HEAD)
+          echo "Found tag: $CONJURE_TAG"
+          echo "| `conjure-python` | $CONJURE_TAG |" >> ../release.txt
+          ./gradlew build --no-daemon
+
+      - name: Build conjure-postman
+        run: |
+          cd conjure-postman
+          CONJURE_TAG=$(git describe --tags HEAD)
+          echo "Found tag: $CONJURE_TAG"
+          echo "| `conjure-postman` | $CONJURE_TAG |" >> ../release.txt
+          ./gradlew build --no-daemon
+          
+      - name: Build conjure-typescript
+        run: |
+          cd conjure-typescript
+          CONJURE_TAG=$(git describe --tags HEAD)
+          echo "Found tag: $CONJURE_TAG"
+          echo "| `conjure-typescript` | $CONJURE_TAG |" >> ../release.txt
+          yarn
+          yarn build
+
+      - name: GH Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ env.release_name }}
+          body_path: release.txt
+          files: |
+            conjure/conjure/build/distributions/conjure.tgz
+            conjure/conjure/build/distributions/conjure.zip
+            conjure-python/conjure-python/build/distributions/conjure-python.tgz
+            conjure-python/conjure-python/build/distributions/conjure-python.zip
+            conjure-postman/conjure-postman/build/distributions/conjure-postman.tgz
+            conjure-postman/conjure-postman/build/distributions/conjure-postman.zip
+            conjure-typescript/dist/bin/conjure-typescript
+            conjure-typescript/dist/bin/conjure-typescript.bat
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_RELEASE_TOKEN }}
