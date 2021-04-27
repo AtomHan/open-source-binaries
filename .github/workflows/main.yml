@@ -17,7 +17,7 @@ jobs:
     steps:
       # Used as the release name
       - name: set release name
-        run: echo "release_name=auto-release-$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+        run: echo "release_name=auto-release-$(date +'%Y-%m-%dT%H-%M-%S')" >> $GITHUB_ENV
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
