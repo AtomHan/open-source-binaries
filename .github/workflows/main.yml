@@ -16,8 +16,8 @@ jobs:
 
     steps:
       # Used as the release name
-      - name: set env
-        run: echo "now=$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
+      - name: set release name
+        run: echo "release_name=auto-release-$(date +'%Y-%m-%dT%H:%M:%S')" >> $GITHUB_ENV
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
@@ -66,7 +66,7 @@ jobs:
       - name: GH Release
         uses: softprops/action-gh-release@v0.1.5
         with:
-          tag_name: ${{ env.NOW }}
+          tag_name: ${{ env.release_name }}
           body_path: release.txt
           files: |
             conjure/conjure/build/distributions/conjure.tgz
