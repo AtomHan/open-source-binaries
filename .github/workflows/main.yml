@@ -16,8 +16,11 @@ jobs:
 
     steps:
       # Used as the release name
-      - name: set release name
-        run: echo "release_name=auto-release-$(date +'%Y-%m-%dT%H-%M-%S')" >> $GITHUB_ENV
+      - name: initialise release
+        run: |
+          echo "release_name=auto-release-$(date +'%Y-%m-%dT%H-%M-%S')" >> $GITHUB_ENV
+          echo '| Binary | Version |' > release.txt
+          echo '| :-- | --: |' >> release.txt
 
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
@@ -35,33 +38,36 @@ jobs:
 
       - name: Build conjure
         run: |
+          CONJURE_TAG=$(cd conjure && git describe --tags HEAD)
+          echo "Found tag: $CONJURE_TAG"
+          echo "| `conjure` | $CONJURE_TAG |" >> release.txt
           cd conjure
           ./gradlew build --no-daemon
 
       - name: Build conjure-python
         run: |
+          CONJURE_TAG=$(cd conjure-python && git describe --tags HEAD)
+          echo "Found tag: $CONJURE_TAG"
+          echo "| `conjure-python` | $CONJURE_TAG |" >> release.txt
           cd conjure-python
           ./gradlew build --no-daemon
 
       - name: Build conjure-postman
         run: |
+          CONJURE_TAG=$(cd conjure-postman && git describe --tags HEAD)
+          echo "Found tag: $CONJURE_TAG"
+          echo "| `conjure-postman` | $CONJURE_TAG |" >> release.txt
           cd conjure-postman
           ./gradlew build --no-daemon
           
       - name: Build conjure-typescript
         run: |
+          CONJURE_TAG=$(cd conjure-typescript && git describe --tags HEAD)
+          echo "Found tag: $CONJURE_TAG"
+          echo "| `conjure-typescript` | $CONJURE_TAG |" >> release.txt
           cd conjure-typescript
           yarn
           yarn build
-
-      - name: Compile release body
-        run: |
-          echo '| Binary | Version |' > release.txt
-          echo '| :-- | --: |' >> release.txt
-          echo "| Conjure | $(cd conjure && git describe --tags HEAD) |" >> release.txt
-          echo "| Conjure Python | $(cd conjure-python && git describe --tags HEAD) |" >> release.txt
-          echo "| Conjure Typescript | $(cd conjure-typescript && git describe --tags HEAD) |" >> release.txt
-          echo "| Conjure Postman | $(cd conjure-postman && git describe --tags HEAD) |" >> release.txt
 
       - name: GH Release
         uses: softprops/action-gh-release@v1
