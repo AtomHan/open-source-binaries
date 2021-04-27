@@ -29,17 +29,17 @@ jobs:
       - name: Build conjure
         run: |
           cd conjure
-          ./gradlew build
+          ./gradlew build --no-daemon
 
       - name: Build conjure-python
         run: |
           cd conjure-python
-          ./gradlew build
+          ./gradlew build --no-daemon
 
       - name: Build conjure-postman
         run: |
           cd conjure-postman
-          ./gradlew build
+          ./gradlew build --no-daemon
 
       - name: GH Release
         uses: softprops/action-gh-release@v0.1.5
