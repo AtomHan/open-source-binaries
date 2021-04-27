@@ -4,11 +4,10 @@ name: Release Binaries
 
 # Controls when the action will run. 
 on:
-  # Triggers the workflow on push or pull request events but only for the master branch
+  # Triggers the workflow on push events but only for tags
   push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
+    tags:
+      - 'v*.*.*'
     
   workflow_dispatch:
 
@@ -25,6 +24,15 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: 'true'
+          
+      # Used for conjure-typescript
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '15'
+          
+      # Used for conjure-typescript
+      - name: Install yarn
+        run: npm i -g yarn
 
       - name: Build conjure
         run: |
@@ -40,9 +48,16 @@ jobs:
         run: |
           cd conjure-postman
           ./gradlew build --no-daemon
+          
+      - name: Build conjure-typescript
+        run: |
+          cd conjure-typescript
+          yarn
+          yarn build
 
       - name: GH Release
         uses: softprops/action-gh-release@v0.1.5
+        if: startsWith(github.ref, 'refs/tags/')
         with:
           files: |
             conjure/conjure/build/distributions/conjure.tgz
@@ -51,3 +66,5 @@ jobs:
             conjure-python/conjure-python/build/distributions/conjure-python.zip
             conjure-postman/conjure-postman/build/distributions/conjure-postman.tgz
             conjure-postman/conjure-postman/build/distributions/conjure-postman.zip
+            conjure-typescript/dist/bin/conjure-typescript
+            conjure-typescript/dist/bin/conjure-typescript.bat
